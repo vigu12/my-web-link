@@ -1,32 +1,26 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Private Page</title>
-  <script>
-    const password = prompt("Enter password to view this page:");
-    if (password !== "Nandana") {
-      document.write("Access Denied");
-      throw new Error("Unauthorized");
-    }
-  </script>
-</head>
-<body>
-  <h1>Welcome to the secret page!</h1>
-  <p>This page is only visible to people who have the link and the password.</p>
-</body>
-</html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEET Aspirant Companion</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6a5acd;
-            --secondary: #9370db;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEET Aspirant Companion</title>
+
+  <!-- 🔒 Password Protection -->
+  <script>
+    const password = prompt("Enter password:");
+    if (password !== "Nandana") {
+      document.write("❌ Access Denied");
+      throw new Error("Unauthorized access");
+    }
+  </script>
+
+  <!-- 💅 Styles and Fonts -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+      :root {
+          --primary: #6a5acd;
+          --secondary: #9370db;
             --accent: #ff6b6b;
             --light: #f8f9fa;
             --dark: #1a1a2e;
