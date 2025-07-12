@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emoji Battle Royale | GitHub Game</title>
+    <title>DrawTogether - Play with Your GF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +14,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -26,11 +26,11 @@
         
         .container {
             width: 100%;
-            max-width: 900px;
-            background: rgba(255, 255, 255, 0.1);
+            max-width: 1200px;
+            background: rgba(25, 25, 35, 0.85);
             backdrop-filter: blur(10px);
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             overflow: hidden;
             padding: 30px;
             position: relative;
@@ -40,130 +40,123 @@
         header {
             text-align: center;
             margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
         }
         
         h1 {
             font-size: 3.5rem;
             margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(to right, #ffcc00, #ff4d4d);
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #e0e0ff;
+        }
+        
+        .couple-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        
+        .player {
+            text-align: center;
+            padding: 20px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.3s ease;
+            width: 200px;
+        }
+        
+        .player.active {
+            background: rgba(255, 105, 180, 0.2);
+            box-shadow: 0 0 25px rgba(255, 105, 180, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .player-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
         
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto;
-            line-height: 1.6;
+        .player-name {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #ffb6c1;
+            margin-bottom: 10px;
         }
         
-        .game-container {
-            display: flex;
-            gap: 20px;
+        .player-score {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+        }
+        
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
             margin-bottom: 30px;
         }
         
-        .player {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.15);
+        .canvas-container {
+            background: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
         }
         
-        .player:before {
+        .canvas-container:before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>');
             z-index: -1;
         }
         
-        .player.active {
-            background: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            transform: scale(1.02);
-        }
-        
-        .player h2 {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-            color: #ffcc00;
-            text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-        }
-        
-        .score {
-            font-size: 4rem;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #ffcc00;
-            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
-        }
-        
-        .emoji-display {
-            font-size: 6rem;
-            height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            padding: 10px;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        
-        .game-controls {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            padding: 25px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .game-controls:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent);
-            z-index: -1;
-        }
-        
-        .timer {
-            font-size: 4rem;
-            font-weight: bold;
-            margin: 20px 0;
-            color: #ff4d4d;
-            text-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
-        }
-        
-        .banned-words {
-            font-size: 1.4rem;
-            background: rgba(255, 0, 0, 0.2);
-            padding: 15px;
+        canvas {
+            background: white;
             border-radius: 10px;
-            margin: 20px 0;
-            min-height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            line-height: 1.6;
+            display: block;
+            margin: 0 auto;
+            cursor: crosshair;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .controls {
+        #drawCanvas {
+            background: #fff;
+        }
+        
+        #guessCanvas {
+            background: #f8f8f8;
+        }
+        
+        .canvas-title {
+            text-align: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffb6c1;
+        }
+        
+        .tools {
             display: flex;
             justify-content: center;
             gap: 15px;
@@ -171,160 +164,213 @@
             flex-wrap: wrap;
         }
         
+        .tool-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .tool-btn:hover {
+            background: rgba(255, 105, 180, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .tool-btn.active {
+            background: #ff69b4;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.7);
+        }
+        
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .color {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+        
+        .color:hover {
+            transform: scale(1.2);
+        }
+        
+        .game-controls {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .word-display {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #ffcc00;
+            min-height: 60px;
+            letter-spacing: 3px;
+        }
+        
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff7e5f;
+            margin: 20px 0;
+            text-shadow: 0 0 10px rgba(255, 126, 95, 0.5);
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
         button {
-            padding: 15px 30px;
+            padding: 15px 35px;
             font-size: 1.2rem;
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            background: #ffcc00;
-            color: #333;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
             font-weight: bold;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 20px rgba(255, 126, 95, 0.4);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         button:hover {
-            background: #ffdd55;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.6);
         }
         
         button:active {
-            transform: translateY(1px);
+            transform: translateY(0);
         }
         
-        #start-btn {
+        #new-word-btn {
             background: linear-gradient(to right, #4CAF50, #2E8B57);
-            color: white;
-            font-size: 1.4rem;
-            padding: 18px 40px;
         }
         
-        #correct-btn {
-            background: linear-gradient(to right, #4CAF50, #2E8B57);
-            color: white;
+        #guess-btn {
+            background: linear-gradient(to right, #2196F3, #21CBF3);
         }
         
-        #skip-btn {
+        #clear-btn {
             background: linear-gradient(to right, #ff4d4d, #cc0000);
-            color: white;
         }
         
         .instructions {
             margin-top: 30px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 25px;
             border-radius: 15px;
-            position: relative;
-        }
-        
-        .instructions:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/></svg>');
-            background-size: 20px 20px;
-            z-index: -1;
         }
         
         .instructions h3 {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ffb6c1;
+            text-align: center;
+        }
+        
+        .instructions-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .instructions-column {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .instructions-column h4 {
+            font-size: 1.4rem;
             margin-bottom: 15px;
             color: #ffcc00;
-            text-align: center;
         }
         
-        .instructions ol {
-            text-align: left;
-            padding-left: 20px;
-            line-height: 1.8;
-            font-size: 1.1rem;
-            max-width: 700px;
-            margin: 0 auto;
+        .instructions-column ul {
+            padding-left: 25px;
         }
         
-        .instructions li {
-            margin-bottom: 10px;
-            position: relative;
-            padding-left: 30px;
+        .instructions-column li {
+            margin-bottom: 12px;
+            line-height: 1.6;
         }
         
-        .instructions li:before {
-            content: '👉';
+        .hearts {
             position: absolute;
-            left: 0;
-            top: 0;
-        }
-        
-        .github-link {
-            display: inline-block;
-            margin-top: 20px;
-            color: #ffcc00;
-            text-decoration: none;
-            font-size: 1.1rem;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px 20px;
-            border-radius: 30px;
-            transition: all 0.3s ease;
-        }
-        
-        .github-link i {
-            margin-right: 8px;
-        }
-        
-        .github-link:hover {
-            text-decoration: none;
-            background: rgba(0, 0, 0, 0.3);
-            transform: translateY(-3px);
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 30px;
-            opacity: 0.8;
-            font-size: 0.9rem;
-        }
-        
-        .emoji-background {
-            position: absolute;
-            font-size: 10rem;
-            opacity: 0.1;
+            font-size: 2rem;
+            color: #ff69b4;
             z-index: 1;
-            animation: float 15s infinite linear;
+            animation: float 6s infinite linear;
         }
         
         @keyframes float {
             0% {
                 transform: translate(0, 0) rotate(0deg);
+                opacity: 0;
             }
-            25% {
-                transform: translate(50px, 50px) rotate(90deg);
+            10% {
+                opacity: 1;
             }
-            50% {
-                transform: translate(100px, 0) rotate(180deg);
-            }
-            75% {
-                transform: translate(50px, -50px) rotate(270deg);
+            90% {
+                opacity: 1;
             }
             100% {
-                transform: translate(0, 0) rotate(360deg);
+                transform: translate(100px, -100px) rotate(360deg);
+                opacity: 0;
             }
         }
         
-        @media (max-width: 768px) {
-            .game-container {
-                flex-direction: column;
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+        
+        @media (max-width: 900px) {
+            .game-area {
+                grid-template-columns: 1fr;
             }
             
+            .instructions-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 600px) {
             h1 {
                 font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
             }
             
             .controls {
@@ -340,253 +386,359 @@
     </style>
 </head>
 <body>
-    <!-- Floating emoji background elements -->
-    <div class="emoji-background" style="top: 10%; left: 5%;">🤺</div>
-    <div class="emoji-background" style="top: 20%; right: 8%;">🎮</div>
-    <div class="emoji-background" style="bottom: 15%; left: 7%;">🎯</div>
-    <div class="emoji-background" style="bottom: 25%; right: 10%;">🏆</div>
-    <div class="emoji-background" style="top: 40%; left: 15%;">😂</div>
+    <!-- Floating hearts -->
+    <div class="hearts" style="top: 5%; left: 5%;">❤️</div>
+    <div class="hearts" style="top: 10%; right: 10%;">💖</div>
+    <div class="hearts" style="bottom: 15%; left: 15%;">💕</div>
+    <div class="hearts" style="bottom: 20%; right: 20%;">💞</div>
+    <div class="hearts" style="top: 40%; left: 5%;">💘</div>
     
     <div class="container">
         <header>
-            <h1>Emoji Battle Royale</h1>
-            <p class="subtitle">A hilarious game for two friends! Describe emoji combos without saying the banned words.</p>
+            <h1>DrawTogether ❤️</h1>
+            <p class="subtitle">Draw pictures for your partner to guess - perfect for couples playing together while apart!</p>
         </header>
         
-        <div class="game-container">
-            <div class="player active" id="player1">
-                <h2><i class="fas fa-user"></i> Player 1</h2>
-                <div class="score" id="score1">0</div>
-                <div class="emoji-display" id="player1-emoji">😎</div>
+        <div class="couple-container">
+            <div class="player active" id="playerA">
+                <div class="player-icon">👨</div>
+                <div class="player-name">Player A</div>
+                <div class="player-score">0</div>
             </div>
             
-            <div class="player" id="player2">
-                <h2><i class="fas fa-user"></i> Player 2</h2>
-                <div class="score" id="score2">0</div>
-                <div class="emoji-display" id="player2-emoji">🤩</div>
+            <div class="player" id="playerB">
+                <div class="player-icon">👩</div>
+                <div class="player-name">Player B</div>
+                <div class="player-score">0</div>
+            </div>
+        </div>
+        
+        <div class="game-area">
+            <div class="canvas-container">
+                <h2 class="canvas-title">Your Drawing Canvas</h2>
+                <canvas id="drawCanvas" width="500" height="400"></canvas>
+                <div class="tools">
+                    <div class="tool-btn active" id="penTool" title="Pen">✏️</div>
+                    <div class="tool-btn" id="eraserTool" title="Eraser">🧹</div>
+                    <div class="tool-btn" id="clearTool" title="Clear Canvas">🗑️</div>
+                </div>
+                <div class="color-picker">
+                    <div class="color" style="background-color: #000000;" data-color="#000000"></div>
+                    <div class="color" style="background-color: #ff0000;" data-color="#ff0000"></div>
+                    <div class="color" style="background-color: #0000ff;" data-color="#0000ff"></div>
+                    <div class="color" style="background-color: #00ff00;" data-color="#00ff00"></div>
+                    <div class="color" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
+                    <div class="color" style="background-color: #ff9900;" data-color="#ff9900"></div>
+                </div>
+            </div>
+            
+            <div class="canvas-container">
+                <h2 class="canvas-title">Guess Your Partner's Drawing</h2>
+                <canvas id="guessCanvas" width="500" height="400"></canvas>
+                <div class="tools">
+                    <input type="text" id="guessInput" placeholder="Type your guess here..." style="padding: 12px; width: 70%; border-radius: 30px; border: none; background: rgba(255,255,255,0.9);">
+                </div>
             </div>
         </div>
         
         <div class="game-controls">
-            <div class="timer" id="timer">30</div>
-            <div class="banned-words" id="banned-words">Banned words will appear here</div>
+            <div class="word-display" id="currentWord">House</div>
+            <div class="timer" id="timer">60</div>
             
             <div class="controls">
-                <button id="start-btn"><i class="fas fa-play"></i> Start Game</button>
-                <button id="correct-btn"><i class="fas fa-check"></i> Correct!</button>
-                <button id="skip-btn"><i class="fas fa-forward"></i> Skip</button>
+                <button id="new-word-btn"><i class="fas fa-sync-alt"></i> New Word</button>
+                <button id="guess-btn"><i class="fas fa-check"></i> Submit Guess</button>
+                <button id="clear-btn"><i class="fas fa-broom"></i> Clear Canvas</button>
             </div>
         </div>
         
         <div class="instructions">
-            <h3><i class="fas fa-info-circle"></i> How to Play</h3>
-            <ol>
-                <li><strong>Player A</strong> gets a random emoji combo</li>
-                <li>Describe it to <strong>Player B</strong> without using the <strong>banned words</strong></li>
-                <li>Player B has <strong>30 seconds</strong> to guess correctly</li>
-                <li>Swap roles each round</li>
-                <li>First to <strong>5 points</strong> wins!</li>
-            </ol>
-        </div>
-        
-        <div style="text-align: center; margin-top: 20px;">
-            <a href="https://github.com/" class="github-link" target="_blank">
-                <i class="fab fa-github"></i> Hosted on GitHub Pages
-            </a>
+            <h3><i class="fas fa-heart"></i> How to Play with Your Partner</h3>
+            <div class="instructions-content">
+                <div class="instructions-column">
+                    <h4>When It's Your Turn to Draw</h4>
+                    <ul>
+                        <li>You'll see a word at the top of the screen</li>
+                        <li>Draw that word on the left canvas</li>
+                        <li>Your partner will see your drawing in real-time</li>
+                        <li>They'll try to guess what you're drawing!</li>
+                        <li>You have 60 seconds to complete your drawing</li>
+                    </ul>
+                </div>
+                <div class="instructions-column">
+                    <h4>When It's Your Turn to Guess</h4>
+                    <ul>
+                        <li>Watch the right canvas for your partner's drawing</li>
+                        <li>Type your guess in the input box</li>
+                        <li>Submit your guess when you're ready</li>
+                        <li>Correct guesses earn you points!</li>
+                        <li>First to 10 points wins the game</li>
+                    </ul>
+                </div>
+            </div>
         </div>
         
         <footer>
-            <p>Made with ❤️ for fun with friends | Emoji Battle Royale v1.0</p>
+            <p>Made with ❤️ for couples in long-distance relationships | Share the game link with your partner to play together!</p>
         </footer>
     </div>
 
     <script>
         // Game data
-        const emojis = ["🐒", "🐱", "🦄", "🦸", "🧟‍♂️", "👑", "💣", "💨", "🍕", "🍌", "🎸", "🎉", "🚀", "🚗", "👻", "🤖", "👽", "🦖", "🐉", "🦊", "🐧", "🐙", "🦉", "🦩", "🍔", "🍦", "🍩", "🏀", "⚽", "🎮"];
-        const bannedWordsMap = {
-            "🐒💨🍌": ["monkey", "fart", "banana"],
-            "🐱💣🎉": ["cat", "bomb", "party"],
-            "🦸🍕💨": ["hero", "pizza", "gas"],
-            "🧟‍♂️🚗💨": ["zombie", "car", "fart"],
-            "👑🐱💥": ["crown", "cat", "explode"],
-            "🚀👽🍕": ["rocket", "alien", "pizza"],
-            "🎸🔥🤘": ["guitar", "fire", "rock"],
-            "🦄🌈💩": ["unicorn", "rainbow", "poop"],
-            "🍌🙈🎪": ["banana", "monkey", "circus"],
-            "👻🛌💤": ["ghost", "bed", "sleep"],
-            "🤖💔🥀": ["robot", "heartbreak", "rose"],
-            "🦖🌋🏃": ["dinosaur", "volcano", "run"],
-            "🐙🎨🌊": ["octopus", "paint", "ocean"],
-            "🦉📚🌙": ["owl", "book", "moon"],
-            "🍔🍟😋": ["burger", "fries", "yummy"]
-        };
+        const words = [
+            "Heart", "Sunset", "Flower", "House", "Tree", 
+            "Dog", "Cat", "Car", "Boat", "Airplane",
+            "Pizza", "Ice Cream", "Cake", "Book", "Guitar",
+            "Beach", "Mountain", "Star", "Moon", "Cloud",
+            "Smile", "Crown", "Castle", "Dragon", "Unicorn",
+            "Gift", "Clock", "Key", "Lock", "Bridge"
+        ];
         
         // Game state
-        let currentCombo = "";
-        let currentBannedWords = [];
-        let currentPlayer = 1;
-        let scores = [0, 0];
+        let currentWord = "";
+        let currentPlayer = "A";
+        let scores = { A: 0, B: 0 };
         let gameActive = false;
-        let timerInterval;
-        let timeLeft = 30;
+        let timer;
+        let timeLeft = 60;
+        
+        // Canvas elements
+        const drawCanvas = document.getElementById('drawCanvas');
+        const guessCanvas = document.getElementById('guessCanvas');
+        const drawCtx = drawCanvas.getContext('2d');
+        const guessCtx = guessCanvas.getContext('2d');
+        
+        // Drawing state
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentColor = "#000000";
+        let currentTool = "pen";
+        let lineWidth = 5;
         
         // DOM elements
-        const player1El = document.getElementById('player1');
-        const player2El = document.getElementById('player2');
-        const score1El = document.getElementById('score1');
-        const score2El = document.getElementById('score2');
+        const playerA = document.getElementById('playerA');
+        const playerB = document.getElementById('playerB');
+        const currentWordEl = document.getElementById('currentWord');
         const timerEl = document.getElementById('timer');
-        const bannedWordsEl = document.getElementById('banned-words');
-        const startBtn = document.getElementById('start-btn');
-        const correctBtn = document.getElementById('correct-btn');
-        const skipBtn = document.getElementById('skip-btn');
+        const newWordBtn = document.getElementById('new-word-btn');
+        const guessBtn = document.getElementById('guess-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const guessInput = document.getElementById('guessInput');
+        const penTool = document.getElementById('penTool');
+        const eraserTool = document.getElementById('eraserTool');
+        const clearTool = document.getElementById('clearTool');
         
         // Initialize game
         function initGame() {
-            startBtn.addEventListener('click', startGame);
-            correctBtn.addEventListener('click', correctGuess);
-            skipBtn.addEventListener('click', nextTurn);
+            // Setup event listeners
+            newWordBtn.addEventListener('click', startNewRound);
+            guessBtn.addEventListener('click', checkGuess);
+            clearBtn.addEventListener('click', clearCanvas);
+            penTool.addEventListener('click', () => setTool('pen'));
+            eraserTool.addEventListener('click', () => setTool('eraser'));
+            clearTool.addEventListener('click', clearCanvas);
             
-            correctBtn.disabled = true;
-            skipBtn.disabled = true;
+            // Setup color pickers
+            document.querySelectorAll('.color').forEach(color => {
+                color.addEventListener('click', () => {
+                    currentColor = color.getAttribute('data-color');
+                });
+            });
             
-            // Set initial emojis
-            document.getElementById('player1-emoji').textContent = '😎';
-            document.getElementById('player2-emoji').textContent = '🤩';
+            // Setup canvas events
+            setupCanvasEvents();
+            
+            // Start the game
+            startNewRound();
         }
         
-        // Start the game
-        function startGame() {
-            gameActive = true;
-            scores = [0, 0];
-            currentPlayer = 1;
-            updateScores();
-            startBtn.disabled = true;
-            correctBtn.disabled = false;
-            skipBtn.disabled = false;
-            startBtn.textContent = 'Restart Game';
-            nextTurn();
-        }
-        
-        // Start a new turn
-        function nextTurn() {
-            // Reset timer
-            clearInterval(timerInterval);
-            timeLeft = 30;
-            timerEl.textContent = timeLeft;
-            timerEl.style.color = '#ff4d4d';
+        // Start a new round
+        function startNewRound() {
+            // Clear canvases
+            clearCanvas();
+            guessCtx.clearRect(0, 0, guessCanvas.width, guessCanvas.height);
+            
+            // Get new random word
+            currentWord = words[Math.floor(Math.random() * words.length)];
+            currentWordEl.textContent = currentWord;
             
             // Switch player
-            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            currentPlayer = currentPlayer === "A" ? "B" : "A";
             
             // Update UI
-            player1El.classList.toggle('active', currentPlayer === 1);
-            player2El.classList.toggle('active', currentPlayer === 2);
+            playerA.classList.toggle('active', currentPlayer === "A");
+            playerB.classList.toggle('active', currentPlayer === "B");
             
-            // Get a random combo
-            const combos = Object.keys(bannedWordsMap);
-            currentCombo = combos[Math.floor(Math.random() * combos.length)];
-            currentBannedWords = bannedWordsMap[currentCombo];
-            
-            // Display combo and banned words
-            document.getElementById(`player${currentPlayer}-emoji`).textContent = currentCombo;
-            bannedWordsEl.innerHTML = `<span style="color:#ffcc00; font-weight:bold;">BANNED:</span> ${currentBannedWords.join(', ')}`;
+            // Reset timer
+            clearInterval(timer);
+            timeLeft = 60;
+            timerEl.textContent = timeLeft;
             
             // Start timer
-            timerInterval = setInterval(() => {
+            gameActive = true;
+            timer = setInterval(() => {
                 timeLeft--;
                 timerEl.textContent = timeLeft;
                 
-                // Change color when time is running out
                 if (timeLeft <= 10) {
                     timerEl.style.color = '#ff0000';
                     timerEl.style.animation = 'pulse 0.5s infinite';
                 }
                 
                 if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
+                    clearInterval(timer);
                     timerEl.style.animation = '';
-                    nextTurn();
+                    endRound(false);
                 }
             }, 1000);
-        }
-        
-        // Handle correct guess
-        function correctGuess() {
-            scores[currentPlayer - 1]++;
-            updateScores();
             
-            // Check for win
-            if (scores[currentPlayer - 1] >= 5) {
-                endGame();
-                return;
-            }
-            
-            // Confetti effect
-            createConfetti();
-            nextTurn();
+            // Reset guess input
+            guessInput.value = "";
         }
         
-        // Update score display
-        function updateScores() {
-            score1El.textContent = scores[0];
-            score2El.textContent = scores[1];
-        }
-        
-        // End the game
-        function endGame() {
+        // End the round
+        function endRound(correct) {
             gameActive = false;
-            clearInterval(timerInterval);
-            timerEl.style.animation = '';
+            clearInterval(timer);
             
-            const winner = scores[0] > scores[1] ? 1 : 2;
-            bannedWordsEl.innerHTML = `<span style="color:#ffcc00; font-size:1.8rem; text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);">Player ${winner} wins! 🎉</span>`;
+            if (correct) {
+                // Update score
+                scores[currentPlayer]++;
+                document.querySelector(`#player${currentPlayer} .player-score`).textContent = scores[currentPlayer];
+                
+                // Show celebration
+                createHearts();
+                
+                // Check for win
+                if (scores[currentPlayer] >= 10) {
+                    setTimeout(() => {
+                        alert(`Player ${currentPlayer} wins the game! 🎉`);
+                        scores = { A: 0, B: 0 };
+                        document.querySelectorAll('.player-score').forEach(el => el.textContent = "0");
+                    }, 1000);
+                }
+            }
             
-            startBtn.disabled = false;
-            correctBtn.disabled = true;
-            skipBtn.disabled = true;
+            // Start next round after delay
+            setTimeout(startNewRound, 3000);
+        }
+        
+        // Check player's guess
+        function checkGuess() {
+            if (!gameActive) return;
             
-            // Big confetti celebration
-            for (let i = 0; i < 5; i++) {
-                setTimeout(createConfetti, i * 300);
+            const guess = guessInput.value.trim().toLowerCase();
+            const word = currentWord.toLowerCase();
+            
+            if (guess === word) {
+                endRound(true);
+            } else {
+                guessInput.value = "";
+                guessInput.placeholder = "Try again...";
+                setTimeout(() => {
+                    guessInput.placeholder = "Type your guess here...";
+                }, 1000);
             }
         }
         
-        // Create confetti effect
-        function createConfetti() {
-            const confettiCount = 100;
-            const confettiContainer = document.querySelector('.game-controls');
-            const emojis = ['🎉', '🎊', '✨', '🥳', '🎈', '🏆', '💫', '🌟', '⭐', '😄', '🎯', '👑'];
+        // Clear the canvas
+        function clearCanvas() {
+            drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        }
+        
+        // Set current tool
+        function setTool(tool) {
+            currentTool = tool;
             
-            for (let i = 0; i < confettiCount; i++) {
-                const confetti = document.createElement('div');
-                confetti.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
-                confetti.style.position = 'absolute';
-                confetti.style.fontSize = Math.random() * 20 + 10 + 'px';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.top = '-50px';
-                confetti.style.opacity = Math.random() * 0.5 + 0.5;
-                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                confetti.style.zIndex = '1000';
-                confetti.style.userSelect = 'none';
-                confetti.style.pointerEvents = 'none';
+            // Update UI
+            penTool.classList.toggle('active', tool === 'pen');
+            eraserTool.classList.toggle('active', tool === 'eraser');
+        }
+        
+        // Setup canvas drawing events
+        function setupCanvasEvents() {
+            drawCanvas.addEventListener('mousedown', startDrawing);
+            drawCanvas.addEventListener('mousemove', draw);
+            drawCanvas.addEventListener('mouseup', stopDrawing);
+            drawCanvas.addEventListener('mouseout', stopDrawing);
+            
+            // Touch events for mobile
+            drawCanvas.addEventListener('touchstart', handleTouch);
+            drawCanvas.addEventListener('touchmove', handleTouch);
+            drawCanvas.addEventListener('touchend', stopDrawing);
+        }
+        
+        // Handle touch events
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent(e.type, {
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+            
+            if (e.type === 'touchstart') {
+                startDrawing(mouseEvent);
+            } else if (e.type === 'touchmove') {
+                draw(mouseEvent);
+            }
+        }
+        
+        // Start drawing
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = drawCanvas.getBoundingClientRect();
+            [lastX, lastY] = [e.clientX - rect.left, e.clientY - rect.top];
+        }
+        
+        // Draw on canvas
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            const rect = drawCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            drawCtx.strokeStyle = currentTool === 'eraser' ? '#FFFFFF' : currentColor;
+            drawCtx.lineWidth = currentTool === 'eraser' ? 20 : lineWidth;
+            drawCtx.lineCap = 'round';
+            drawCtx.lineJoin = 'round';
+            
+            drawCtx.beginPath();
+            drawCtx.moveTo(lastX, lastY);
+            drawCtx.lineTo(x, y);
+            drawCtx.stroke();
+            
+            [lastX, lastY] = [x, y];
+            
+            // Copy to guess canvas in "real-time"
+            guessCtx.clearRect(0, 0, guessCanvas.width, guessCanvas.height);
+            guessCtx.drawImage(drawCanvas, 0, 0);
+        }
+        
+        // Stop drawing
+        function stopDrawing() {
+            isDrawing = false;
+        }
+        
+        // Create floating hearts effect
+        function createHearts() {
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('hearts');
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.top = `${Math.random() * 100}%`;
+                heart.style.fontSize = `${Math.random() * 2 + 1}rem`;
+                heart.style.animationDuration = `${Math.random() * 4 + 3}s`;
                 
-                confettiContainer.appendChild(confetti);
+                document.body.appendChild(heart);
                 
-                const animationDuration = Math.random() * 3000 + 2000;
-                
-                const animation = confetti.animate(
-                    [
-                        { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
-                        { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
-                    ],
-                    {
-                        duration: animationDuration,
-                        easing: 'cubic-bezier(0,0,0.2,1)'
-                    }
-                );
-                
-                animation.onfinish = () => confetti.remove();
+                // Remove heart after animation
+                setTimeout(() => {
+                    heart.remove();
+                }, 6000);
             }
         }
         
