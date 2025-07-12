@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Battle Royale | GitHub Game</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 30px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .game-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .player {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .player.active {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .player h2 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+        
+        .score {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+        }
+        
+        .emoji-display {
+            font-size: 6rem;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 10px;
+        }
+        
+        .game-controls {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .timer {
+            font-size: 4rem;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #ff4d4d;
+        }
+        
+        .banned-words {
+            font-size: 1.4rem;
+            background: rgba(255, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            min-height: 70px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: #ffcc00;
+            color: #333;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:hover {
+            background: #ffdd55;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #start-btn {
+            background: #4CAF50;
+            color: white;
+            font-size: 1.4rem;
+            padding: 18px 40px;
+        }
+        
+        #correct-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        #skip-btn {
+            background: #ff4d4d;
+            color: white;
+        }
+        
+        .instructions {
+            margin-top: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .instructions h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #ffcc00;
+        }
+        
+        .instructions ol {
+            text-align: left;
+            padding-left: 20px;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .github-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #ffcc00;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+        
+        .github-link i {
+            margin-right: 8px;
+        }
+        
+        .github-link:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            opacity: 0.8;
+        }
+        
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Emoji Battle Royale <span>🤺🎮</span></h1>
+            <p class="subtitle">A hilarious game for two friends! Describe emoji combos without saying the banned words.</p>
+        </header>
+        
+        <div class="game-container">
+            <div class="player active" id="player1">
+                <h2>Player 1</h2>
+                <div class="score" id="score1">0</div>
+                <div class="emoji-display" id="player1-emoji">😎</div>
+            </div>
+            
+            <div class="player" id="player2">
+                <h2>Player 2</h2>
+                <div class="score" id="score2">0</div>
+                <div class="emoji-display" id="player2-emoji">🤩</div>
+            </div>
+        </div>
+        
+        <div class="game-controls">
+            <div class="timer" id="timer">30</div>
+            <div class="banned-words" id="banned-words">Banned words will appear here</div>
+            
+            <div class="controls">
+                <button id="start-btn"><i class="fas fa-play"></i> Start Game</button>
+                <button id="correct-btn"><i class="fas fa-check"></i> Correct!</button>
+                <button id="skip-btn"><i class="fas fa-forward"></i> Skip</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ol>
+                <li><strong>Player A</strong> gets a random emoji combo</li>
+                <li>Describe it to <strong>Player B</strong> without using the <strong>banned words</strong></li>
+                <li>Player B has <strong>30 seconds</strong> to guess correctly</li>
+                <li>Swap roles each round</li>
+                <li>First to <strong>10 points</strong> wins!</li>
+            </ol>
+        </div>
+        
+        <a href="https://vigu12.github.io/my-web-link/" class="github-link" target="_blank">
+            <i class="fab fa-github"></i> Hosted on your GitHub subdomain
+        </a>
+        
+        <footer>
+            <p>Made with ❤️ for fun with friends | Host on GitHub Pages</p>
+        </footer>
+    </div>
+
+    <script>
+        // Game data
+        const emojis = ["🐒", "🐱", "🦄", "🦸", "🧟‍♂️", "👑", "💣", "💨", "🍕", "🍌", "🎸", "🎉", "🚀", "🚗"];
+        const bannedWordsMap = {
+            "🐒💨🍌": ["monkey", "fart", "banana"],
+            "🐱💣🎉": ["cat", "bomb", "party"],
+            "🦸🍕💨": ["hero", "pizza", "gas"],
+            "🧟‍♂️🚗💨": ["zombie", "car", "fart"],
+            "👑🐱💥": ["crown", "cat", "explode"],
+            "🚀👽🍕": ["rocket", "alien", "pizza"],
+            "🎸🔥🤘": ["guitar", "fire", "rock"],
+            "🦄🌈💩": ["unicorn", "rainbow", "poop"],
+            "🍌🙈🎪": ["banana", "monkey", "circus"],
+            "👻🛌💤": ["ghost", "bed", "sleep"]
+        };
+        
+        // Game state
+        let currentCombo = "";
+        let currentBannedWords = [];
+        let currentPlayer = 1;
+        let scores = [0, 0];
+        let gameActive = false;
+        let timerInterval;
+        let timeLeft = 30;
+        
+        // DOM elements
+        const player1El = document.getElementById('player1');
+        const player2El = document.getElementById('player2');
+        const score1El = document.getElementById('score1');
+        const score2El = document.getElementById('score2');
+        const timerEl = document.getElementById('timer');
+        const bannedWordsEl = document.getElementById('banned-words');
+        const startBtn = document.getElementById('start-btn');
+        const correctBtn = document.getElementById('correct-btn');
+        const skipBtn = document.getElementById('skip-btn');
+        
+        // Initialize game
+        function initGame() {
+            startBtn.addEventListener('click', startGame);
+            correctBtn.addEventListener('click', correctGuess);
+            skipBtn.addEventListener('click', nextTurn);
+            
+            correctBtn.disabled = true;
+            skipBtn.disabled = true;
+        }
+        
+        // Start the game
+        function startGame() {
+            gameActive = true;
+            scores = [0, 0];
+            currentPlayer = 1;
+            updateScores();
+            startBtn.disabled = true;
+            correctBtn.disabled = false;
+            skipBtn.disabled = false;
+            nextTurn();
+        }
+        
+        // Start a new turn
+        function nextTurn() {
+            // Reset timer
+            clearInterval(timerInterval);
+            timeLeft = 30;
+            timerEl.textContent = timeLeft;
+            
+            // Switch player
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            
+            // Update UI
+            player1El.classList.toggle('active', currentPlayer === 1);
+            player2El.classList.toggle('active', currentPlayer === 2);
+            
+            // Get a random combo
+            const combos = Object.keys(bannedWordsMap);
+            currentCombo = combos[Math.floor(Math.random() * combos.length)];
+            currentBannedWords = bannedWordsMap[currentCombo];
+            
+            // Display combo and banned words
+            document.getElementById(`player${currentPlayer}-emoji`).textContent = currentCombo;
+            bannedWordsEl.textContent = `Banned words: ${currentBannedWords.join(', ')}`;
+            
+            // Start timer
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    nextTurn();
+                }
+            }, 1000);
+        }
+        
+        // Handle correct guess
+        function correctGuess() {
+            scores[currentPlayer - 1]++;
+            updateScores();
+            
+            // Check for win
+            if (scores[currentPlayer - 1] >= 10) {
+                endGame();
+                return;
+            }
+            
+            // Confetti effect
+            createConfetti();
+            nextTurn();
+        }
+        
+        // Update score display
+        function updateScores() {
+            score1El.textContent = scores[0];
+            score2El.textContent = scores[1];
+        }
+        
+        // End the game
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            const winner = scores[0] > scores[1] ? 1 : 2;
+            bannedWordsEl.innerHTML = `<span style="color:#ffcc00; font-size:1.8rem;">Player ${winner} wins! 🎉</span>`;
+            
+            startBtn.disabled = false;
+            correctBtn.disabled = true;
+            skipBtn.disabled = true;
+            startBtn.textContent = 'Play Again';
+            
+            // Big confetti celebration
+            for (let i = 0; i < 5; i++) {
+                setTimeout(createConfetti, i * 300);
+            }
+        }
+        
+        // Create confetti effect
+        function createConfetti() {
+            const confettiCount = 150;
+            const confettiContainer = document.querySelector('.game-controls');
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.innerHTML = ['🎉', '🎊', '✨', '🥳', '🎈', '🏆'][Math.floor(Math.random() * 6)];
+                confetti.style.position = 'absolute';
+                confetti.style.fontSize = Math.random() * 20 + 10 + 'px';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-50px';
+                confetti.style.opacity = Math.random() * 0.5 + 0.5;
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                confetti.style.zIndex = '1000';
+                
+                confettiContainer.appendChild(confetti);
+                
+                const animation = confetti.animate(
+                    [
+                        { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+                        { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                    ],
+                    {
+                        duration: Math.random() * 3000 + 2000,
+                        easing: 'cubic-bezier(0,0,0.2,1)'
+                    }
+                );
+                
+                animation.onfinish = () => confetti.remove();
+            }
+        }
+        
+        // Initialize the game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
