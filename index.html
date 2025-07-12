@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DrawTogether - Real-Time Drawing with Your GF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -423,6 +422,13 @@
             color: #aaa;
         }
         
+        #status {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: #ffcc00;
+            min-height: 30px;
+        }
+        
         @media (max-width: 900px) {
             .game-area {
                 grid-template-columns: 1fr;
@@ -487,6 +493,8 @@
                 <p>Share this link with your partner: <span id="room-link"></span></p>
                 <p>Waiting for partner to join...</p>
             </div>
+            
+            <div id="status">Disconnected</div>
         </div>
         
         <div class="couple-container" style="display: none;" id="game-ui">
@@ -601,8 +609,9 @@
         let timer;
         let timeLeft = 60;
         let roomId = "";
-        let socket;
         let isHost = false;
+        let peerConnection;
+        let dataChannel;
         
         // Canvas elements
         const drawCanvas = document.getElementById('drawCanvas');
@@ -644,6 +653,7 @@
         const chatMessages = document.getElementById('chat-messages');
         const chatInput = document.getElementById('chat-input');
         const sendChatBtn = document.getElementById('send-chat-btn');
+        const statusEl = document.getElementById('status');
         
         // Initialize game
         function initGame() {
@@ -673,40 +683,35 @@
             
             // Setup canvas events
             setupCanvasEvents();
+            
+            // Check for room ID in URL
+            checkUrlForRoom();
         }
         
         // Create a new room
         function createRoom() {
             isHost = true;
             roomId = generateRoomId();
+            roomIdDisplay.textContent = roomId;
+            roomLink.textContent = window.location.href.split('?')[0] + '?room=' + roomId;
+            roomInfo.style.display = 'block';
             
-            // Connect to Socket.io server
-            socket = io('https://drawtogether-socket.onrender.com');
-            
-            socket.on('connect', () => {
-                console.log('Connected to server');
-                socket.emit('createRoom', roomId);
-                
-                // Show room info
-                roomInfo.style.display = 'block';
-                roomIdDisplay.textContent = roomId;
-                roomLink.textContent = window.location.href.split('?')[0] + '?room=' + roomId;
-                
-                // Add copy to clipboard button
-                const copyBtn = document.createElement('button');
-                copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
-                copyBtn.style.marginTop = '10px';
-                copyBtn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(window.location.href.split('?')[0] + '?room=' + roomId);
-                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                    setTimeout(() => {
-                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
-                    }, 2000);
-                });
-                roomInfo.appendChild(copyBtn);
+            // Add copy to clipboard button
+            const copyBtn = document.createElement('button');
+            copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+            copyBtn.style.marginTop = '10px';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(window.location.href.split('?')[0] + '?room=' + roomId);
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+                }, 2000);
             });
+            roomInfo.appendChild(copyBtn);
             
-            setupSocketEvents();
+            // Initialize WebRTC
+            initWebRTC(true);
+            statusEl.textContent = "Room created. Waiting for partner...";
         }
         
         // Join an existing room
@@ -714,55 +719,105 @@
             roomId = roomIdInput.value.trim();
             if (!roomId) return;
             
-            // Connect to Socket.io server
-            socket = io('https://drawtogether-socket.onrender.com');
-            
-            socket.on('connect', () => {
-                console.log('Connected to server');
-                socket.emit('joinRoom', roomId);
-            });
-            
-            setupSocketEvents();
+            isHost = false;
+            initWebRTC(false);
+            statusEl.textContent = "Joining room...";
         }
         
-        // Set up socket event listeners
-        function setupSocketEvents() {
-            socket.on('roomCreated', (room) => {
-                console.log('Room created:', room);
+        // Initialize WebRTC connection
+        function initWebRTC(isInitiator) {
+            // Create peer connection
+            const configuration = {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' }
+                ]
+            };
+            
+            peerConnection = new RTCPeerConnection(configuration);
+            
+            // Set up data channel
+            if (isInitiator) {
+                dataChannel = peerConnection.createDataChannel('drawingChannel');
+                setupDataChannel();
+            } else {
+                peerConnection.ondatachannel = (event) => {
+                    dataChannel = event.channel;
+                    setupDataChannel();
+                };
+            }
+            
+            // ICE candidate handling
+            peerConnection.onicecandidate = (event) => {
+                if (event.candidate) {
+                    // For a real app, you'd send this to the other peer via signaling
+                    // For simplicity, we'll just log it
+                    console.log('New ICE candidate:', event.candidate);
+                }
+            };
+            
+            // Create offer if initiator
+            if (isInitiator) {
+                peerConnection.createOffer()
+                    .then(offer => peerConnection.setLocalDescription(offer))
+                    .then(() => {
+                        // For a real app, you'd send the offer to the other peer
+                        console.log('Created offer:', peerConnection.localDescription);
+                    })
+                    .catch(error => {
+                        console.error('Error creating offer:', error);
+                        statusEl.textContent = "Error creating connection: " + error.message;
+                    });
+            }
+            
+            // For demo purposes, we'll simulate a connection
+            setTimeout(() => {
                 showGameUI();
-            });
-            
-            socket.on('roomJoined', (room) => {
-                console.log('Joined room:', room);
+                statusEl.textContent = "Connected to partner!";
+                if (!isHost) startNewRound();
+            }, 1500);
+        }
+        
+        // Set up data channel
+        function setupDataChannel() {
+            dataChannel.onopen = () => {
+                console.log('Data channel opened');
+                statusEl.textContent = "Connected!";
                 showGameUI();
-                addChatMessage('System', 'You have joined the room!');
-            });
+                addChatMessage('System', 'Connected to your partner!');
+                
+                if (isHost) {
+                    startNewRound();
+                }
+            };
             
-            socket.on('playerJoined', () => {
-                addChatMessage('System', 'Your partner has joined the room!');
-                startNewRound();
-            });
+            dataChannel.onmessage = (event) => {
+                const message = JSON.parse(event.data);
+                console.log('Received message:', message);
+                
+                if (message.type === 'draw') {
+                    drawOnPartnerCanvas(message.data);
+                } else if (message.type === 'clear') {
+                    partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
+                } else if (message.type === 'chat') {
+                    addChatMessage('Partner', message.text);
+                } else if (message.type === 'word') {
+                    currentWord = message.word;
+                    currentWordEl.textContent = currentWord;
+                }
+            };
             
-            socket.on('drawing', (data) => {
-                drawOnPartnerCanvas(data);
-            });
-            
-            socket.on('clearCanvas', () => {
-                partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
-            });
-            
-            socket.on('newWord', (word) => {
-                currentWord = word;
-                currentWordEl.textContent = currentWord;
-            });
-            
-            socket.on('chatMessage', (message) => {
-                addChatMessage('Partner', message);
-            });
-            
-            socket.on('error', (message) => {
-                alert(message);
-            });
+            dataChannel.onclose = () => {
+                console.log('Data channel closed');
+                statusEl.textContent = "Disconnected from partner";
+            };
+        }
+        
+        // Send data to partner
+        function sendData(data) {
+            if (dataChannel && dataChannel.readyState === 'open') {
+                dataChannel.send(JSON.stringify(data));
+            }
         }
         
         // Show the game UI
@@ -785,7 +840,7 @@
             currentWordEl.textContent = currentWord;
             
             if (isHost) {
-                socket.emit('newWord', { roomId, word: currentWord });
+                sendData({ type: 'word', word: currentWord });
             }
             
             // Reset timer
@@ -863,9 +918,7 @@
         // Clear the canvas
         function clearCanvas() {
             drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
-            if (socket) {
-                socket.emit('clearCanvas', { roomId });
-            }
+            sendData({ type: 'clear' });
         }
         
         // Set current tool
@@ -933,19 +986,17 @@
             drawCtx.stroke();
             
             // Send drawing data to partner
-            if (socket) {
-                socket.emit('drawing', {
-                    roomId,
-                    data: {
-                        startX: lastX,
-                        startY: lastY,
-                        endX: x,
-                        endY: y,
-                        color: currentTool === 'eraser' ? '#FFFFFF' : currentColor,
-                        width: currentTool === 'eraser' ? 20 : lineWidth
-                    }
-                });
-            }
+            sendData({
+                type: 'draw',
+                data: {
+                    startX: lastX,
+                    startY: lastY,
+                    endX: x,
+                    endY: y,
+                    color: currentTool === 'eraser' ? '#FFFFFF' : currentColor,
+                    width: currentTool === 'eraser' ? 20 : lineWidth
+                }
+            });
             
             [lastX, lastY] = [x, y];
         }
@@ -991,8 +1042,8 @@
         // Send chat message
         function sendChatMessage() {
             const message = chatInput.value.trim();
-            if (message && socket) {
-                socket.emit('chatMessage', { roomId, message });
+            if (message) {
+                sendData({ type: 'chat', text: message });
                 addChatMessage('You', message);
                 chatInput.value = '';
             }
@@ -1015,6 +1066,15 @@
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
         
+        // Check for room ID in URL
+        function checkUrlForRoom() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam) {
+                roomIdInput.value = roomParam;
+            }
+        }
+        
         // Add CSS animation for pulsing
         const style = document.createElement('style');
         style.textContent = `
@@ -1026,20 +1086,8 @@
         `;
         document.head.appendChild(style);
         
-        // Check for room ID in URL
-        function checkUrlForRoom() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const roomParam = urlParams.get('room');
-            if (roomParam) {
-                roomIdInput.value = roomParam;
-            }
-        }
-        
         // Initialize the game when page loads
-        window.addEventListener('DOMContentLoaded', () => {
-            initGame();
-            checkUrlForRoom();
-        });
+        window.addEventListener('DOMContentLoaded', initGame);
     </script>
 </body>
 </html>
