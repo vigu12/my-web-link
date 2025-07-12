@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DrawTogether - Play with Your GF</title>
+    <title>DrawTogether - Real-Time Drawing with Your GF</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -27,7 +28,7 @@
         .container {
             width: 100%;
             max-width: 1200px;
-            background: rgba(25, 25, 35, 0.85);
+            background: rgba(25, 25, 35, 0.9);
             backdrop-filter: blur(10px);
             border-radius: 20px;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
@@ -57,9 +58,73 @@
             font-size: 1.3rem;
             opacity: 0.9;
             max-width: 800px;
-            margin: 0 auto;
+            margin: 10px auto 0;
             line-height: 1.6;
             color: #e0e0ff;
+        }
+        
+        .connection-panel {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        .connection-panel h2 {
+            color: #ffb6c1;
+            margin-bottom: 15px;
+        }
+        
+        .connection-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        input, button {
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            font-size: 1.1rem;
+        }
+        
+        input {
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            min-width: 250px;
+        }
+        
+        button {
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 126, 95, 0.6);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #create-room-btn {
+            background: linear-gradient(to right, #4CAF50, #2E8B57);
+        }
+        
+        #join-room-btn {
+            background: linear-gradient(to right, #2196F3, #21CBF3);
         }
         
         .couple-container {
@@ -76,12 +141,14 @@
             background: rgba(255, 255, 255, 0.08);
             transition: all 0.3s ease;
             width: 200px;
+            opacity: 0.7;
         }
         
         .player.active {
             background: rgba(255, 105, 180, 0.2);
             box-shadow: 0 0 25px rgba(255, 105, 180, 0.4);
             transform: translateY(-5px);
+            opacity: 1;
         }
         
         .player-icon {
@@ -119,17 +186,7 @@
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
-        }
-        
-        .canvas-container:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 100 100"><rect width="100" height="100" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/></svg>');
-            z-index: -1;
+            min-height: 500px;
         }
         
         canvas {
@@ -139,13 +196,15 @@
             margin: 0 auto;
             cursor: crosshair;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
         }
         
         #drawCanvas {
             background: #fff;
         }
         
-        #guessCanvas {
+        #partnerCanvas {
             background: #f8f8f8;
         }
         
@@ -195,6 +254,7 @@
             gap: 10px;
             justify-content: center;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
         
         .color {
@@ -243,31 +303,6 @@
             flex-wrap: wrap;
         }
         
-        button {
-            padding: 15px 35px;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            background: linear-gradient(to right, #ff7e5f, #feb47b);
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(255, 126, 95, 0.4);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.6);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
         #new-word-btn {
             background: linear-gradient(to right, #4CAF50, #2E8B57);
         }
@@ -278,6 +313,39 @@
         
         #clear-btn {
             background: linear-gradient(to right, #ff4d4d, #cc0000);
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .chat-messages {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 30px;
+            border: none;
+        }
+        
+        .chat-input button {
+            padding: 12px 25px;
         }
         
         .instructions {
@@ -327,6 +395,7 @@
             color: #ff69b4;
             z-index: 1;
             animation: float 6s infinite linear;
+            pointer-events: none;
         }
         
         @keyframes float {
@@ -373,14 +442,18 @@
                 font-size: 1.1rem;
             }
             
-            .controls {
+            .controls, .connection-controls {
                 flex-direction: column;
                 align-items: center;
             }
             
-            button {
+            button, input {
                 width: 100%;
                 max-width: 300px;
+            }
+            
+            .player {
+                width: 150px;
             }
         }
     </style>
@@ -396,24 +469,41 @@
     <div class="container">
         <header>
             <h1>DrawTogether ❤️</h1>
-            <p class="subtitle">Draw pictures for your partner to guess - perfect for couples playing together while apart!</p>
+            <p class="subtitle">Real-time drawing with your girlfriend - see each other's creations as you draw!</p>
         </header>
         
-        <div class="couple-container">
+        <div class="connection-panel" id="connection-panel">
+            <h2><i class="fas fa-plug"></i> Connect with Your Partner</h2>
+            <p>Create a private room or join your partner's room to start drawing together</p>
+            
+            <div class="connection-controls">
+                <button id="create-room-btn"><i class="fas fa-plus-circle"></i> Create Private Room</button>
+                <input type="text" id="room-id-input" placeholder="Enter Room ID">
+                <button id="join-room-btn"><i class="fas fa-sign-in-alt"></i> Join Room</button>
+            </div>
+            
+            <div id="room-info" style="margin-top: 20px; font-size: 1.2rem; display: none;">
+                <p>Your Room ID: <strong id="room-id-display"></strong></p>
+                <p>Share this link with your partner: <span id="room-link"></span></p>
+                <p>Waiting for partner to join...</p>
+            </div>
+        </div>
+        
+        <div class="couple-container" style="display: none;" id="game-ui">
             <div class="player active" id="playerA">
                 <div class="player-icon">👨</div>
-                <div class="player-name">Player A</div>
+                <div class="player-name">You</div>
                 <div class="player-score">0</div>
             </div>
             
             <div class="player" id="playerB">
                 <div class="player-icon">👩</div>
-                <div class="player-name">Player B</div>
+                <div class="player-name">Partner</div>
                 <div class="player-score">0</div>
             </div>
         </div>
         
-        <div class="game-area">
+        <div class="game-area" style="display: none;" id="game-area">
             <div class="canvas-container">
                 <h2 class="canvas-title">Your Drawing Canvas</h2>
                 <canvas id="drawCanvas" width="500" height="400"></canvas>
@@ -429,26 +519,37 @@
                     <div class="color" style="background-color: #00ff00;" data-color="#00ff00"></div>
                     <div class="color" style="background-color: #ff00ff;" data-color="#ff00ff"></div>
                     <div class="color" style="background-color: #ff9900;" data-color="#ff9900"></div>
+                    <div class="color" style="background-color: #ff69b4;" data-color="#ff69b4"></div>
+                    <div class="color" style="background-color: #8a2be2;" data-color="#8a2be2"></div>
                 </div>
             </div>
             
             <div class="canvas-container">
-                <h2 class="canvas-title">Guess Your Partner's Drawing</h2>
-                <canvas id="guessCanvas" width="500" height="400"></canvas>
+                <h2 class="canvas-title">Your Partner's Drawing</h2>
+                <canvas id="partnerCanvas" width="500" height="400"></canvas>
                 <div class="tools">
                     <input type="text" id="guessInput" placeholder="Type your guess here..." style="padding: 12px; width: 70%; border-radius: 30px; border: none; background: rgba(255,255,255,0.9);">
+                    <button id="guess-btn"><i class="fas fa-check"></i> Guess</button>
                 </div>
             </div>
         </div>
         
-        <div class="game-controls">
+        <div class="game-controls" style="display: none;" id="game-controls">
             <div class="word-display" id="currentWord">House</div>
             <div class="timer" id="timer">60</div>
             
             <div class="controls">
                 <button id="new-word-btn"><i class="fas fa-sync-alt"></i> New Word</button>
-                <button id="guess-btn"><i class="fas fa-check"></i> Submit Guess</button>
                 <button id="clear-btn"><i class="fas fa-broom"></i> Clear Canvas</button>
+            </div>
+        </div>
+        
+        <div class="chat-container" id="chat-container">
+            <h3><i class="fas fa-comments"></i> Chat with Your Partner</h3>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input">
+                <input type="text" id="chat-input" placeholder="Type your message...">
+                <button id="send-chat-btn"><i class="fas fa-paper-plane"></i> Send</button>
             </div>
         </div>
         
@@ -456,23 +557,21 @@
             <h3><i class="fas fa-heart"></i> How to Play with Your Partner</h3>
             <div class="instructions-content">
                 <div class="instructions-column">
-                    <h4>When It's Your Turn to Draw</h4>
+                    <h4>Getting Started</h4>
                     <ul>
-                        <li>You'll see a word at the top of the screen</li>
-                        <li>Draw that word on the left canvas</li>
-                        <li>Your partner will see your drawing in real-time</li>
-                        <li>They'll try to guess what you're drawing!</li>
-                        <li>You have 60 seconds to complete your drawing</li>
+                        <li>One person creates a private room and shares the Room ID</li>
+                        <li>The other person enters the Room ID to join</li>
+                        <li>Once connected, you'll see each other's drawings in real-time</li>
+                        <li>Use the chat to talk while you play</li>
                     </ul>
                 </div>
                 <div class="instructions-column">
-                    <h4>When It's Your Turn to Guess</h4>
+                    <h4>Gameplay</h4>
                     <ul>
-                        <li>Watch the right canvas for your partner's drawing</li>
-                        <li>Type your guess in the input box</li>
-                        <li>Submit your guess when you're ready</li>
-                        <li>Correct guesses earn you points!</li>
-                        <li>First to 10 points wins the game</li>
+                        <li>When it's your turn, you'll see a word to draw</li>
+                        <li>Draw the word on your canvas - your partner will see it live!</li>
+                        <li>Your partner will try to guess what you're drawing</li>
+                        <li>Correct guesses earn points - first to 10 wins!</li>
                     </ul>
                 </div>
             </div>
@@ -501,12 +600,15 @@
         let gameActive = false;
         let timer;
         let timeLeft = 60;
+        let roomId = "";
+        let socket;
+        let isHost = false;
         
         // Canvas elements
         const drawCanvas = document.getElementById('drawCanvas');
-        const guessCanvas = document.getElementById('guessCanvas');
+        const partnerCanvas = document.getElementById('partnerCanvas');
         const drawCtx = drawCanvas.getContext('2d');
-        const guessCtx = guessCanvas.getContext('2d');
+        const partnerCtx = partnerCanvas.getContext('2d');
         
         // Drawing state
         let isDrawing = false;
@@ -517,6 +619,17 @@
         let lineWidth = 5;
         
         // DOM elements
+        const connectionPanel = document.getElementById('connection-panel');
+        const roomIdInput = document.getElementById('room-id-input');
+        const createRoomBtn = document.getElementById('create-room-btn');
+        const joinRoomBtn = document.getElementById('join-room-btn');
+        const roomInfo = document.getElementById('room-info');
+        const roomIdDisplay = document.getElementById('room-id-display');
+        const roomLink = document.getElementById('room-link');
+        const gameUI = document.getElementById('game-ui');
+        const gameArea = document.getElementById('game-area');
+        const gameControls = document.getElementById('game-controls');
+        const chatContainer = document.getElementById('chat-container');
         const playerA = document.getElementById('playerA');
         const playerB = document.getElementById('playerB');
         const currentWordEl = document.getElementById('currentWord');
@@ -528,16 +641,28 @@
         const penTool = document.getElementById('penTool');
         const eraserTool = document.getElementById('eraserTool');
         const clearTool = document.getElementById('clearTool');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
         
         // Initialize game
         function initGame() {
             // Setup event listeners
+            createRoomBtn.addEventListener('click', createRoom);
+            joinRoomBtn.addEventListener('click', joinRoom);
             newWordBtn.addEventListener('click', startNewRound);
             guessBtn.addEventListener('click', checkGuess);
             clearBtn.addEventListener('click', clearCanvas);
             penTool.addEventListener('click', () => setTool('pen'));
             eraserTool.addEventListener('click', () => setTool('eraser'));
             clearTool.addEventListener('click', clearCanvas);
+            sendChatBtn.addEventListener('click', sendChatMessage);
+            
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendChatMessage();
+                }
+            });
             
             // Setup color pickers
             document.querySelectorAll('.color').forEach(color => {
@@ -548,27 +673,120 @@
             
             // Setup canvas events
             setupCanvasEvents();
+        }
+        
+        // Create a new room
+        function createRoom() {
+            isHost = true;
+            roomId = generateRoomId();
             
-            // Start the game
-            startNewRound();
+            // Connect to Socket.io server
+            socket = io('https://drawtogether-socket.onrender.com');
+            
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                socket.emit('createRoom', roomId);
+                
+                // Show room info
+                roomInfo.style.display = 'block';
+                roomIdDisplay.textContent = roomId;
+                roomLink.textContent = window.location.href.split('?')[0] + '?room=' + roomId;
+                
+                // Add copy to clipboard button
+                const copyBtn = document.createElement('button');
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+                copyBtn.style.marginTop = '10px';
+                copyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(window.location.href.split('?')[0] + '?room=' + roomId);
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy Link';
+                    }, 2000);
+                });
+                roomInfo.appendChild(copyBtn);
+            });
+            
+            setupSocketEvents();
+        }
+        
+        // Join an existing room
+        function joinRoom() {
+            roomId = roomIdInput.value.trim();
+            if (!roomId) return;
+            
+            // Connect to Socket.io server
+            socket = io('https://drawtogether-socket.onrender.com');
+            
+            socket.on('connect', () => {
+                console.log('Connected to server');
+                socket.emit('joinRoom', roomId);
+            });
+            
+            setupSocketEvents();
+        }
+        
+        // Set up socket event listeners
+        function setupSocketEvents() {
+            socket.on('roomCreated', (room) => {
+                console.log('Room created:', room);
+                showGameUI();
+            });
+            
+            socket.on('roomJoined', (room) => {
+                console.log('Joined room:', room);
+                showGameUI();
+                addChatMessage('System', 'You have joined the room!');
+            });
+            
+            socket.on('playerJoined', () => {
+                addChatMessage('System', 'Your partner has joined the room!');
+                startNewRound();
+            });
+            
+            socket.on('drawing', (data) => {
+                drawOnPartnerCanvas(data);
+            });
+            
+            socket.on('clearCanvas', () => {
+                partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
+            });
+            
+            socket.on('newWord', (word) => {
+                currentWord = word;
+                currentWordEl.textContent = currentWord;
+            });
+            
+            socket.on('chatMessage', (message) => {
+                addChatMessage('Partner', message);
+            });
+            
+            socket.on('error', (message) => {
+                alert(message);
+            });
+        }
+        
+        // Show the game UI
+        function showGameUI() {
+            connectionPanel.style.display = 'none';
+            gameUI.style.display = 'flex';
+            gameArea.style.display = 'grid';
+            gameControls.style.display = 'block';
+            chatContainer.style.display = 'block';
         }
         
         // Start a new round
         function startNewRound() {
             // Clear canvases
             clearCanvas();
-            guessCtx.clearRect(0, 0, guessCanvas.width, guessCanvas.height);
+            partnerCtx.clearRect(0, 0, partnerCanvas.width, partnerCanvas.height);
             
             // Get new random word
             currentWord = words[Math.floor(Math.random() * words.length)];
             currentWordEl.textContent = currentWord;
             
-            // Switch player
-            currentPlayer = currentPlayer === "A" ? "B" : "A";
-            
-            // Update UI
-            playerA.classList.toggle('active', currentPlayer === "A");
-            playerB.classList.toggle('active', currentPlayer === "B");
+            if (isHost) {
+                socket.emit('newWord', { roomId, word: currentWord });
+            }
             
             // Reset timer
             clearInterval(timer);
@@ -613,7 +831,7 @@
                 // Check for win
                 if (scores[currentPlayer] >= 10) {
                     setTimeout(() => {
-                        alert(`Player ${currentPlayer} wins the game! 🎉`);
+                        addChatMessage('System', `Player ${currentPlayer} wins the game! 🎉`);
                         scores = { A: 0, B: 0 };
                         document.querySelectorAll('.player-score').forEach(el => el.textContent = "0");
                     }, 1000);
@@ -645,6 +863,9 @@
         // Clear the canvas
         function clearCanvas() {
             drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+            if (socket) {
+                socket.emit('clearCanvas', { roomId });
+            }
         }
         
         // Set current tool
@@ -673,6 +894,7 @@
         function handleTouch(e) {
             e.preventDefault();
             const touch = e.touches[0];
+            const rect = drawCanvas.getBoundingClientRect();
             const mouseEvent = new MouseEvent(e.type, {
                 clientX: touch.clientX,
                 clientY: touch.clientY
@@ -710,11 +932,35 @@
             drawCtx.lineTo(x, y);
             drawCtx.stroke();
             
-            [lastX, lastY] = [x, y];
+            // Send drawing data to partner
+            if (socket) {
+                socket.emit('drawing', {
+                    roomId,
+                    data: {
+                        startX: lastX,
+                        startY: lastY,
+                        endX: x,
+                        endY: y,
+                        color: currentTool === 'eraser' ? '#FFFFFF' : currentColor,
+                        width: currentTool === 'eraser' ? 20 : lineWidth
+                    }
+                });
+            }
             
-            // Copy to guess canvas in "real-time"
-            guessCtx.clearRect(0, 0, guessCanvas.width, guessCanvas.height);
-            guessCtx.drawImage(drawCanvas, 0, 0);
+            [lastX, lastY] = [x, y];
+        }
+        
+        // Draw on partner's canvas
+        function drawOnPartnerCanvas(data) {
+            partnerCtx.strokeStyle = data.color;
+            partnerCtx.lineWidth = data.width;
+            partnerCtx.lineCap = 'round';
+            partnerCtx.lineJoin = 'round';
+            
+            partnerCtx.beginPath();
+            partnerCtx.moveTo(data.startX, data.startY);
+            partnerCtx.lineTo(data.endX, data.endY);
+            partnerCtx.stroke();
         }
         
         // Stop drawing
@@ -742,6 +988,33 @@
             }
         }
         
+        // Send chat message
+        function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (message && socket) {
+                socket.emit('chatMessage', { roomId, message });
+                addChatMessage('You', message);
+                chatInput.value = '';
+            }
+        }
+        
+        // Add message to chat
+        function addChatMessage(sender, message) {
+            const messageElement = document.createElement('div');
+            messageElement.innerHTML = `<strong>${sender}:</strong> ${message}`;
+            messageElement.style.marginBottom = '10px';
+            messageElement.style.padding = '8px';
+            messageElement.style.borderRadius = '10px';
+            messageElement.style.background = sender === 'You' ? 'rgba(255, 105, 180, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Generate a random room ID
+        function generateRoomId() {
+            return Math.random().toString(36).substring(2, 8).toUpperCase();
+        }
+        
         // Add CSS animation for pulsing
         const style = document.createElement('style');
         style.textContent = `
@@ -753,8 +1026,20 @@
         `;
         document.head.appendChild(style);
         
+        // Check for room ID in URL
+        function checkUrlForRoom() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const roomParam = urlParams.get('room');
+            if (roomParam) {
+                roomIdInput.value = roomParam;
+            }
+        }
+        
         // Initialize the game when page loads
-        window.addEventListener('DOMContentLoaded', initGame);
+        window.addEventListener('DOMContentLoaded', () => {
+            initGame();
+            checkUrlForRoom();
+        });
     </script>
 </body>
 </html>
