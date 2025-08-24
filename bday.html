@@ -1,15 +1,17 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday Mandathi!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
@@ -25,7 +27,7 @@
         .container {
             max-width: 800px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
@@ -40,7 +42,7 @@
 
         h1 {
             color: #ff6b6b;
-            font-size: 3rem;
+            font-size: 3.5rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             animation: colorChange 5s infinite alternate;
@@ -48,7 +50,7 @@
 
         h2 {
             color: #6c5ce7;
-            font-size: 1.8rem;
+            font-size: 2rem;
             margin-bottom: 20px;
         }
 
@@ -232,11 +234,40 @@
             100% { transform: translateY(0) rotate(0deg); }
         }
 
+        /* Music player */
+        .music-player {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .music-btn {
+            width: 40px;
+            height: 40px;
+            background: #6c5ce7;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            background: #ff6b6b;
+        }
+
         /* Responsive design */
         @media (max-width: 768px) {
-            h1 { font-size: 2.2rem; }
-            h2 { font-size: 1.5rem; }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.8rem; }
             .sister-photo { width: 150px; height: 150px; }
+            .wishes-container { gap: 10px; }
+            .wish-box { width: 120px; }
         }
     </style>
 </head>
@@ -273,6 +304,16 @@
             <div class="wish-box" onclick="this.innerHTML='💖 Love &amp; Joy!'">Hover for a wish</div>
             <div class="wish-box" onclick="this.innerHTML='🌟 Success &amp; Happiness!'">Hover for a wish</div>
             <div class="wish-box" onclick="this.innerHTML='🎁 Surprises &amp; Delights!'">Hover for a wish</div>
+        </div>
+
+        <div class="music-player">
+            <p>Birthday Music:</p>
+            <div class="music-btn" onclick="toggleMusic()">
+                <i class="fas fa-play" id="music-icon"></i>
+            </div>
+            <audio id="birthday-song" loop>
+                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            </audio>
         </div>
 
         <footer>
@@ -329,6 +370,22 @@
         function makeWish() {
             alert("Make a wish Mandathi! May all your dreams come true! 🎂");
             createConfetti();
+        }
+
+        // Music toggle function
+        function toggleMusic() {
+            const audio = document.getElementById('birthday-song');
+            const icon = document.getElementById('music-icon');
+            
+            if (audio.paused) {
+                audio.play();
+                icon.classList.remove('fa-play');
+                icon.classList.add('fa-pause');
+            } else {
+                audio.pause();
+                icon.classList.remove('fa-pause');
+                icon.classList.add('fa-play');
+            }
         }
 
         // Initialize page elements
