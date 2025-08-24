@@ -1,416 +1,250 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Mandathi!</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>How to View Your Birthday Page</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-
+        
         body {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow-x: hidden;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            position: relative;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .header {
-            margin-bottom: 30px;
-        }
-
-        h1 {
-            color: #ff6b6b;
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            animation: colorChange 5s infinite alternate;
-        }
-
-        h2 {
-            color: #6c5ce7;
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        .birthday-box {
-            background: linear-gradient(45deg, #74ebd5, #9face6);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .birthday-box:hover {
-            transform: translateY(-5px);
-        }
-
-        .message {
-            font-size: 1.2rem;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: #333;
             line-height: 1.6;
-            color: #2d3436;
-            margin-bottom: 20px;
-        }
-
-        .sister-photo {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid #fd79a8;
-            margin: 20px auto;
-            display: block;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            transition: transform 0.5s ease;
-        }
-
-        .sister-photo:hover {
-            transform: scale(1.05) rotate(5deg);
-        }
-
-        .interactive-box {
-            background: #ffeaa7;
-            border-radius: 15px;
+            min-height: 100vh;
             padding: 20px;
-            margin: 25px 0;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .interactive-box h3 {
-            color: #e17055;
-            margin-bottom: 15px;
-        }
-
-        .interactive-box p {
-            color: #2d3436;
-            margin-bottom: 15px;
-        }
-
-        .interactive-box:hover {
-            background: #fdcb6e;
-            transform: scale(1.02);
-        }
-
-        .cake {
-            width: 150px;
-            height: 120px;
-            margin: 20px auto;
-            position: relative;
-            cursor: pointer;
-        }
-
-        .cake-base {
-            width: 150px;
-            height: 60px;
-            background: #f8c291;
-            border-radius: 50% 50% 0 0;
-            position: absolute;
-            bottom: 0;
-        }
-
-        .cake-top {
-            width: 130px;
-            height: 40px;
-            background: #f19066;
-            border-radius: 50% 50% 0 0;
-            position: absolute;
-            bottom: 60px;
-            left: 10px;
-        }
-
-        .candle {
-            width: 10px;
-            height: 30px;
-            background: #fff;
-            position: absolute;
-            bottom: 100px;
-            left: 70px;
-            border-radius: 5px;
-        }
-
-        .flame {
-            width: 15px;
-            height: 30px;
-            background: #ff9f43;
-            border-radius: 50% 50% 20% 20%;
-            position: absolute;
-            bottom: 130px;
-            left: 67.5px;
-            transition: all 0.3s ease;
-            transform-origin: bottom;
-        }
-
-        .cake:hover .flame {
-            animation: flicker 0.5s infinite alternate;
-        }
-
-        .wishes-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin: 20px 0;
-        }
-
-        .wish-box {
-            background: #dfe6e9;
-            padding: 15px;
-            border-radius: 10px;
-            width: 150px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-
-        .wish-box:hover {
-            background: #b2bec3;
-            transform: translateY(-5px);
-        }
-
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ff6b6b;
-            opacity: 0.7;
-            border-radius: 50%;
-        }
-
-        footer {
-            margin-top: 30px;
-            color: #636e72;
-            font-size: 0.9rem;
-        }
-
-        @keyframes colorChange {
-            0% { color: #ff6b6b; }
-            25% { color: #6c5ce7; }
-            50% { color: #00cec9; }
-            75% { color: #fd79a8; }
-            100% { color: #fdcb6e; }
-        }
-
-        @keyframes flicker {
-            0% { transform: scale(1); background: #ff9f43; }
-            100% { transform: scale(1.1); background: #ffd32a; }
-        }
-
-        .balloon {
-            position: absolute;
-            width: 40px;
-            height: 50px;
-            border-radius: 50%;
-            opacity: 0.7;
-            animation: float 15s infinite ease-in-out;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(5deg); }
-            100% { transform: translateY(0) rotate(0deg); }
-        }
-
-        /* Music player */
-        .music-player {
-            margin-top: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
         }
-
-        .music-btn {
-            width: 40px;
-            height: 40px;
+        
+        .container {
+            max-width: 1000px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .steps {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #6c5ce7;
+        }
+        
+        .steps h2 {
+            color: #6c5ce7;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #6c5ce7;
+        }
+        
+        .step {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .step-number {
             background: #6c5ce7;
             color: white;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .step-content h3 {
+            margin-bottom: 5px;
+            color: #2d3436;
+        }
+        
+        .link-section {
+            text-align: center;
+            padding: 20px;
+            background: #e8f4fc;
+            border-radius: 10px;
+        }
+        
+        .link-section h2 {
+            color: #0984e3;
+            margin-bottom: 20px;
+        }
+        
+        .github-link {
+            display: inline-block;
+            background: #0984e3;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 0;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(9, 132, 227, 0.3);
         }
-
-        .music-btn:hover {
-            transform: scale(1.1);
-            background: #ff6b6b;
+        
+        .github-link:hover {
+            background: #0066cc;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(9, 132, 227, 0.4);
         }
-
-        /* Responsive design */
+        
+        .direct-link {
+            margin-top: 25px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .direct-link a {
+            color: #0984e3;
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-all;
+        }
+        
+        .direct-link a:hover {
+            text-decoration: underline;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2d3436;
+            color: white;
+        }
+        
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            h2 { font-size: 1.8rem; }
-            .sister-photo { width: 150px; height: 150px; }
-            .wishes-container { gap: 10px; }
-            .wish-box { width: 120px; }
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Happy Birthday!</h1>
-            <h2>Mandathi - My Dearest Blood Sister</h2>
-        </div>
-
-        <div class="birthday-box">
-            <p class="message">On this special day, I want you to know how much you mean to me. You're not just my sister, but my best friend and confidante. May your day be filled with joy, laughter, and all the things you love the most!</p>
-            
-            <!-- Placeholder for sister's photo - replace with actual image -->
-            <img src="https://placehold.co/200x200?text=Mandathi+Photo" alt="Mandathi's Photo" class="sister-photo">
-        </div>
-
-        <div class="interactive-box" onclick="this.style.backgroundColor=getRandomColor()">
-            <h3>Click for a Color Surprise!</h3>
-            <p>I hope your life is as colorful and beautiful as you've made mine!</p>
-        </div>
-
-        <div class="cake" onclick="makeWish()">
-            <div class="cake-base"></div>
-            <div class="cake-top"></div>
-            <div class="candle"></div>
-            <div class="flame"></div>
-        </div>
-        <p>Click the cake to make a wish!</p>
-
-        <h3>Wishes for You</h3>
-        <div class="wishes-container">
-            <div class="wish-box" onclick="this.innerHTML='🎉 Fun &amp; Laughter!'">Hover for a wish</div>
-            <div class="wish-box" onclick="this.innerHTML='💖 Love &amp; Joy!'">Hover for a wish</div>
-            <div class="wish-box" onclick="this.innerHTML='🌟 Success &amp; Happiness!'">Hover for a wish</div>
-            <div class="wish-box" onclick="this.innerHTML='🎁 Surprises &amp; Delights!'">Hover for a wish</div>
-        </div>
-
-        <div class="music-player">
-            <p>Birthday Music:</p>
-            <div class="music-btn" onclick="toggleMusic()">
-                <i class="fas fa-play" id="music-icon"></i>
+        <header>
+            <h1>How to View Your Birthday Page</h1>
+            <p class="subtitle">A simple guide to accessing Mandathi's birthday page from GitHub</p>
+        </header>
+        
+        <div class="content">
+            <div class="steps">
+                <h2>Step-by-Step Instructions</h2>
+                
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Go to your GitHub repository</h3>
+                        <p>Navigate to your GitHub repository named "my-web-link"</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Find the bday.html file</h3>
+                        <p>Locate the bday.html file in your repository file list</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Click on the file</h3>
+                        <p>Click on the bday.html file to view its content on GitHub</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <h3>View the raw file</h3>
+                        <p>Click the "Raw" button to see the raw HTML file</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">5</div>
+                    <div class="step-content">
+                        <h3>Copy the URL</h3>
+                        <p>Copy the URL from your browser's address bar</p>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">6</div>
+                    <div class="step-content">
+                        <h3>Paste into a new tab</h3>
+                        <p>Paste the URL into a new browser tab and replace "github.com" with "htmlpreview.github.io"</p>
+                    </div>
+                </div>
             </div>
-            <audio id="birthday-song" loop>
-                <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-            </audio>
+            
+            <div class="link-section">
+                <h2>Quick Access</h2>
+                <p>Click the button below to directly view your birthday page:</p>
+                
+                <a href="https://htmlpreview.github.io/?https://github.com/vigu12/my-web-link/blob/main/bday.html" class="github-link">
+                    View Birthday Page
+                </a>
+                
+                <div class="direct-link">
+                    <p>Or use this direct URL:</p>
+                    <a href="https://htmlpreview.github.io/?https://github.com/vigu12/my-web-link/blob/main/bday.html">
+                        https://htmlpreview.github.io/?https://github.com/vigu12/my-web-link/blob/main/bday.html
+                    </a>
+                </div>
+            </div>
         </div>
-
+        
         <footer>
-            <p>Made with love for my amazing sister Mandathi on her special day! 🎂</p>
+            <p>Made with ❤️ for vigu12 - Happy Birthday to Mandathi!</p>
         </footer>
     </div>
-
-    <script>
-        // Create confetti
-        function createConfetti() {
-            const colors = ['#ff6b6b', '#6c5ce7', '#00cec9', '#fd79a8', '#fdcb6e'];
-            const container = document.querySelector('.container');
-            
-            for (let i = 0; i < 30; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.top = Math.random() * 100 + '%';
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.transform = `scale(${Math.random()})`;
-                confetti.style.width = 10 + Math.random() * 10 + 'px';
-                confetti.style.height = confetti.style.width;
-                container.appendChild(confetti);
-            }
-        }
-
-        // Create floating balloons
-        function createBalloons() {
-            const colors = ['#ff6b6b', '#6c5ce7', '#00cec9', '#fd79a8', '#fdcb6e'];
-            const container = document.body;
-            
-            for (let i = 0; i < 10; i++) {
-                const balloon = document.createElement('div');
-                balloon.className = 'balloon';
-                balloon.style.left = Math.random() * 100 + '%';
-                balloon.style.top = 100 + Math.random() * 20 + '%';
-                balloon.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                balloon.style.animationDelay = Math.random() * 5 + 's';
-                container.appendChild(balloon);
-            }
-        }
-
-        // Generate random color
-        function getRandomColor() {
-            const letters = '0123456789ABCDEF';
-            let color = '#';
-            for (let i = 0; i < 6; i++) {
-                color += letters[Math.floor(Math.random() * 16)];
-            }
-            return color;
-        }
-
-        // Make a wish function
-        function makeWish() {
-            alert("Make a wish Mandathi! May all your dreams come true! 🎂");
-            createConfetti();
-        }
-
-        // Music toggle function
-        function toggleMusic() {
-            const audio = document.getElementById('birthday-song');
-            const icon = document.getElementById('music-icon');
-            
-            if (audio.paused) {
-                audio.play();
-                icon.classList.remove('fa-play');
-                icon.classList.add('fa-pause');
-            } else {
-                audio.pause();
-                icon.classList.remove('fa-pause');
-                icon.classList.add('fa-play');
-            }
-        }
-
-        // Initialize page elements
-        window.onload = function() {
-            createConfetti();
-            createBalloons();
-            
-            // Animate wishes on hover
-            const wishBoxes = document.querySelectorAll('.wish-box');
-            wishBoxes.forEach(box => {
-                box.addEventListener('mouseover', function() {
-                    if (this.innerHTML === 'Hover for a wish') {
-                        const wishes = [
-                            '💖 Love & Joy!',
-                            '🎉 Fun & Laughter!',
-                            '🌟 Success & Happiness!',
-                            '🎁 Surprises & Delights!',
-                            '🌈 Colorful Days!',
-                            '✨ Magical Moments!'
-                        ];
-                        this.innerHTML = wishes[Math.floor(Math.random() * wishes.length)];
-                    }
-                });
-            });
-        }
-    </script>
 </body>
 </html>
